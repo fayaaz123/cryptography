@@ -1,0 +1,23 @@
+from Crypto.Cipher import DES
+
+def decrypt_des(ciphertext, key):
+    # Reverse the order of the 16 keys
+    keys = [key[16*i:16*(i+1)] for i in range(16)][::-1]
+    # Use the appropriate shift schedule for the decryption process
+    shifts = [1, 1, 2, 2, 2, 2, 2, 2,
+              1, 2, 2, 2, 2, 2, 2, 1][::-1]
+    # Initialize the DES cipher with the key
+    des_cipher = DES.new(key)
+    # Decrypt the message using each key in reverse order
+    for i in range(16):
+        # Get the current key and shift value
+        key_i = keys[i]
+        shift_i = shifts[i]
+        # Perform the appropriate number of left shifts on the key
+        key_i = key_i[shift_i:] + key_i[:shift_i]
+        # Initialize the DES cipher with the current key
+        des_cipher = DES.new(key_i)
+        # Decrypt the ciphertext using the current key
+        ciphertext = des_cipher.decrypt(ciphertext)
+    # Return the decrypted message
+    return ciphertext
